@@ -7,6 +7,9 @@ fn main() {
 
   println!("sample 1: {}", solve1(&sample));
   println!("input 1: {}", solve1(&input));
+
+  println!("sample 2: {}", solve2(&sample));
+  println!("input 2: {}", solve2(&input));
 }
 
 fn parse(input: &str) -> Vec<Vec<i16>> {
@@ -63,6 +66,7 @@ fn solve1(data: &Vec<Vec<i16>>) -> u32 {
     }
   }
 
+  // vertical
   for x in 0..width {
     let mut prev_height: i16 = -1;
 
@@ -101,4 +105,85 @@ fn solve1(data: &Vec<Vec<i16>>) -> u32 {
   }
 
   visible
+}
+
+fn solve2(data: &Vec<Vec<i16>>) -> u32 {
+  let width = data[0].len();
+  let height = data.len();
+  let mut scores: Vec<Vec<u32>> = data
+    .iter()
+    .map(|trees| trees.iter().map(|_| 1).collect())
+    .collect();
+
+  for y in 0..height {
+    for x in 0..width {
+      let tree_height = data[y][x];
+      let mut trees = 0;
+
+      // look left
+      for k in 1.. {
+        if (x as isize - k as isize) < 0 {
+          break;
+        }
+
+        trees += 1;
+
+        if data[y][x - k] >= tree_height {
+          break;
+        }
+      }
+
+      scores[y][x] *= trees;
+      trees = 0;
+
+      // look right
+      for k in 1.. {
+        if (x as isize + k as isize) > width as isize - 1 {
+          break;
+        }
+
+        trees += 1;
+
+        if data[y][x + k] >= tree_height {
+          break;
+        }
+      }
+
+      scores[y][x] *= trees;
+      trees = 0;
+
+      // look up
+      for k in 1.. {
+        if (y as isize - k as isize) < 0 {
+          break;
+        }
+
+        trees += 1;
+
+        if data[y - k][x] >= tree_height {
+          break;
+        }
+      }
+
+      scores[y][x] *= trees;
+      trees = 0;
+
+      // look down
+      for k in 1.. {
+        if (y as isize + k as isize) > height as isize - 1 {
+          break;
+        }
+
+        trees += 1;
+
+        if data[y + k][x] >= tree_height {
+          break;
+        }
+      }
+
+      scores[y][x] *= trees;
+    }
+  }
+
+  scores.iter().flatten().copied().max().unwrap()
 }

@@ -3,12 +3,18 @@ use std::collections::HashMap;
 const SAMPLE: &'static str = include_str!("./sample.txt");
 const INPUT: &'static str = include_str!("./input.txt");
 
+const MEM_TOTAL: u32 = 70000000;
+const MEM_UPDATE: u32 = 30000000;
+
 fn main() {
   let sample = process(SAMPLE.lines());
   let input = process(INPUT.lines());
 
   println!("sample 1: {:#?}", solve1(&sample));
   println!("part 1: {:#?}", solve1(&input));
+
+  println!("sample 2: {:#?}", solve2(&sample));
+  println!("part 2: {:#?}", solve2(&input));
 }
 
 fn mk_path(cwd: &Vec<(&str, u32)>) -> String {
@@ -96,4 +102,19 @@ fn solve1(data: &HashMap<String, u32>) -> u32 {
       }
     })
     .sum()
+}
+
+fn solve2(data: &HashMap<String, u32>) -> u32 {
+  let unused = MEM_TOTAL - data.get("/").unwrap();
+  data
+    .iter()
+    .filter_map(|(_, &weight)| {
+      if weight + unused >= MEM_UPDATE {
+        Some(weight)
+      } else {
+        None
+      }
+    })
+    .min()
+    .unwrap()
 }
